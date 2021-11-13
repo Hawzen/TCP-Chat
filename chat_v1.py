@@ -92,6 +92,7 @@ if __name__ == "__main__":
     client_timeout = 5
     host_timeout = 15
     log = True
+    print_cool_logo = True
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
 
     # Initializing
@@ -115,14 +116,14 @@ if __name__ == "__main__":
                             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
                             datefmt='%D %H:%M:%S',
                             level=logging.INFO)
-
-    print("""
-  _______ _____ _____     _____ _    _       _______ 
- |__   __/ ____|  __ \   / ____| |  | |   /\|__   __|
-    | | | |    | |__) | | |    | |__| |  /  \  | |   
-    | | | |    |  ___/  | |    |  __  | / /\ \ | |   
-    | | | |____| |      | |____| |  | |/ ____ \| |   
-    |_|  \_____|_|       \_____|_|  |_/_/    \_\_|   
+    if print_cool_logo:
+        print("""
+████████╗ ██████╗██████╗      ██████╗██╗  ██╗ █████╗ ████████╗
+╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝
+   ██║   ██║     ██████╔╝    ██║     ███████║███████║   ██║   
+   ██║   ██║     ██╔═══╝     ██║     ██╔══██║██╔══██║   ██║   
+   ██║   ╚██████╗██║         ╚██████╗██║  ██║██║  ██║   ██║   
+   ╚═╝    ╚═════╝╚═╝          ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
     """)
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
