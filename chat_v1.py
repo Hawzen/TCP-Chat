@@ -109,7 +109,7 @@ if __name__ == "__main__":
     
     if log:
         try:
-            os.mkdir("logs")
+            os.mkdirs(logging_folder)
         except FileExistsError:
             pass
         logging.basicConfig(filename=f"{logging_folder}/{instance_name}.log",
