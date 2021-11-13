@@ -1,6 +1,7 @@
 import os
 import sys
 import math
+import time
 import socket
 import logging
 import datetime
@@ -35,12 +36,14 @@ def message_remote(remote_socket: socket.socket, message_first: bool) -> None:
 
 def process_remote_message(remote_socket: socket.socket, ip: str, port: int) -> None:
     """Checks incoming message and logs it"""
+    name = repr(hexlify(socket.inet_aton(ip)))[2:-1]
+    message_log = f"Remote ({name}, {port}): "
+    print(message_log + "(waiting...)", end="\r")
+
     message = remote_socket.recv(1024).decode("UTF-8")
     
-    name = repr(hexlify(socket.inet_aton(ip)))[2:-1]
-    message_log = f"Remote ({name}, {port}): {message}"
-    print(message_log)
-    logging.info(message_log)
+    print(message_log + message + "            ")
+    logging.info(message_log + message)
 
     if message == "exit":
         exit_procedure(f"Remote {name} exited")
@@ -59,7 +62,7 @@ def make_and_send_local_message(remote_socket: socket.socket) -> str:
         exit_procedure("You exited")
 
 def exit_procedure(optional_message="") -> None:
-    global my_socket
+    # global my_socket
     print(optional_message)
     print("Exitting...")
     logging.info(optional_message)
@@ -70,6 +73,7 @@ def exit_procedure(optional_message="") -> None:
 def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) -> None:
     """Contacts remote_ip as client"""
     global my_socket
+    global host_timing
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
     try:
@@ -77,9 +81,11 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) 
     except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
         logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
-    host_socket.settimeout(None)
-    my_socket.close()
-    threading.Thread(target=message_remote, args=(host_socket, True)).start()
+        
+    if host_timing > time.time():
+        my_socket.close()
+        host_socket.settimeout(None)
+        threading.Thread(target=message_remote, args=(host_socket, True)).start()
 
 if __name__ == "__main__":
     # Variables
@@ -89,6 +95,8 @@ if __name__ == "__main__":
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
 
     # Initializing
+    global host_timing
+    host_timing = math.inf
     global my_socket
 
     assert len(sys.argv) - 1 == 3, f"""Include local port, remote ip, and remote port when calling this script. 
@@ -120,6 +128,7 @@ if __name__ == "__main__":
         while True:
             try:
                 client_socket, (client_ip, client_port) = my_socket.accept()
+                host_timing = time.time()
             except OSError: # Happens when closing my_socket elsewhere
                 break
             threading.Thread(target=message_remote, args=(client_socket, False)).start()
