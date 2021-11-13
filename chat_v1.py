@@ -76,6 +76,7 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) 
     except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
         logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
+    host_socket.settimeout(None)
     threading.Thread(target=message_remote, args=(host_socket, True)).start()
 
 if __name__ == "__main__":
