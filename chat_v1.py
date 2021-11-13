@@ -109,7 +109,7 @@ if __name__ == "__main__":
     
     if log:
         try:
-            os.mkdirs(logging_folder)
+            os.makedirs(logging_folder)
         except FileExistsError:
             pass
         logging.basicConfig(filename=f"{logging_folder}/{instance_name}.log",
@@ -118,7 +118,7 @@ if __name__ == "__main__":
                             datefmt='%D %H:%M:%S',
                             level=logging.INFO)
     if print_cool_logo:
-        print("""
+        print(r"""
 ████████╗ ██████╗██████╗      ██████╗██╗  ██╗ █████╗ ████████╗   ██╗   ██╗ ██╗
 ╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝   ██║   ██║███║
    ██║   ██║     ██████╔╝    ██║     ███████║███████║   ██║█████╗██║   ██║╚██║
