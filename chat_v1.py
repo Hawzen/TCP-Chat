@@ -70,11 +70,12 @@ def exit_procedure(optional_message="") -> None:
     my_socket.close()
     sys.exit()
 
-def initate_conversation(remote_ip, remote_port):
+def initate_conversation(remote_ip, remote_port, client_timeout):
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host_socket.settimeout(client_timeout)
     try:
         host_socket.connect((remote_ip, remote_port))
-    except (ConnectionRefusedError, TimeoutError) as e:
+    except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
         logging.error(f"ConnectionRefusedError: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
     threading.Thread(target=message_remote, args=(host_socket, True)).start()
@@ -105,12 +106,12 @@ if __name__ == "__main__":
                             level=logging.INFO)
 
     # Initiate connection with args target
-    initate_conversation(remote_ip, remote_port)
+    initate_conversation(remote_ip, remote_port, client_timeout)
 
 
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
-        my_socket.settimeout(100)
+        my_socket.settimeout(15)
         my_socket.bind(("0.0.0.0", local_port))
         my_socket.listen()
         
