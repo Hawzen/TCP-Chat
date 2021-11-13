@@ -1,0 +1,101 @@
+import sys
+import socket
+import logging
+from binascii import hexlify
+import threading
+
+def accept_connections(my_socket: socket.socket):
+    """This function continuously listens for connections. Run as daemon thread"""
+    while True:
+        client_socket, (client_ip, client_port) = my_socket.accept()
+        threading.Thread(target=message_remote, args=(client_socket, False)).start()
+
+def message_remote(remote_socket: socket.socket, message_first: bool) -> None:
+    """Given a socket this function initiates a converstation with it"""
+    # remote_socket.settimeout(client_timeout)
+    remote_ip, remote_port = remote_socket.getpeername()
+    print(f"Connected to {remote_socket.getpeername()}")
+    message_count = 0
+    
+    if message_first: 
+        while True:
+            print(f"\nMessage number {message_count}")
+            process_remote_message(remote_socket, ip=remote_ip, port=remote_port)
+            make_and_send_local_message(remote_socket)
+
+            message_count += 1
+    else:
+        while True:
+            print(f"\nMessage number {message_count}")
+            make_and_send_local_message(remote_socket)
+            process_remote_message(remote_socket, ip=remote_ip, port=remote_port)
+
+            message_count += 1
+
+def process_remote_message(remote_socket: socket.socket, ip: str, port: int) -> None:
+    """Checks incoming message and logs it"""
+    message = remote_socket.recv(1024).decode("UTF-8")
+    
+    name = hexlify(socket.inet_aton(ip))[2:-1]
+    message_log = f"Remote ({name}, {port}): {message}"
+    print(message_log)
+    logging.info(message_log)
+
+    if message == "exit":
+        exit_procedure(f"Remote {name} exited")
+
+def make_and_send_local_message(remote_socket: socket.socket) -> str:
+    """Make local message"""  
+    message_log = f"You ({socket.gethostname()}): "
+    message = input(message_log).strip()
+    if not message:
+        return make_and_send_local_message(remote_socket)
+    logging.info(message_log + message)
+    
+    remote_socket.sendall(message.encode("UTF-8"))
+
+    if message == "exit":
+        exit_procedure("You exited")
+
+def exit_procedure(optional_message="") -> None:
+    global my_socket
+    print(optional_message)
+    print("Exitting...")
+    my_socket.close()
+    sys.exit()
+
+
+def initate_conversation(remote_ip, remote_port):
+    host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        host_socket.connect((remote_ip, remote_port))
+    except ConnectionRefusedError as e:
+        logging.error(f"ConnectionRefusedError: The host you're connecting to actively refused connection (have you run the second instance?)")
+        return
+    threading.Thread(target=message_remote, args=(host_socket, True)).start()
+
+if __name__ == "__main__":
+    global my_socket
+    client_timeout = 5
+    host_timeout = client_timeout
+
+    assert len(sys.argv) - 1 == 3, f"""Include local port, remote ip, and remote port when calling this script. 
+    You provided {len(sys.argv)-1} arguments."""
+
+    _, local_port, remote_ip, remote_port = sys.argv
+    local_port, remote_port = int(local_port), int(remote_port)
+
+    # Initiate connection with args target
+    initate_conversation(remote_ip, remote_port)
+
+    # Accept any new connections
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
+        my_socket.settimeout(10)
+        my_socket.bind(("192.168.100.206", local_port))
+        my_socket.listen()
+        while True:
+            try:
+                client_socket, (client_ip, client_port) = my_socket.accept()
+            except OSError:
+                break
+            threading.Thread(target=message_remote, args=(client_socket, False)).start()
