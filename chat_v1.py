@@ -93,6 +93,7 @@ if __name__ == "__main__":
     host_timeout = 15
     log = True
     print_cool_logo = True
+    logging_folder = "logs/chat_v1"
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
 
     # Initializing
@@ -111,19 +112,19 @@ if __name__ == "__main__":
             os.mkdir("logs")
         except FileExistsError:
             pass
-        logging.basicConfig(filename=f"logs/{instance_name}.log",
+        logging.basicConfig(filename=f"{logging_folder}/{instance_name}.log",
                             filemode="w",
                             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
                             datefmt='%D %H:%M:%S',
                             level=logging.INFO)
     if print_cool_logo:
         print("""
-████████╗ ██████╗██████╗      ██████╗██╗  ██╗ █████╗ ████████╗
-╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝
-   ██║   ██║     ██████╔╝    ██║     ███████║███████║   ██║   
-   ██║   ██║     ██╔═══╝     ██║     ██╔══██║██╔══██║   ██║   
-   ██║   ╚██████╗██║         ╚██████╗██║  ██║██║  ██║   ██║   
-   ╚═╝    ╚═════╝╚═╝          ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
+████████╗ ██████╗██████╗      ██████╗██╗  ██╗ █████╗ ████████╗   ██╗   ██╗ ██╗
+╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝   ██║   ██║███║
+   ██║   ██║     ██████╔╝    ██║     ███████║███████║   ██║█████╗██║   ██║╚██║
+   ██║   ██║     ██╔═══╝     ██║     ██╔══██║██╔══██║   ██║╚════╝╚██╗ ██╔╝ ██║
+   ██║   ╚██████╗██║         ╚██████╗██║  ██║██║  ██║   ██║       ╚████╔╝  ██║
+   ╚═╝    ╚═════╝╚═╝          ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝        ╚═══╝   ╚═╝
     """)
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
