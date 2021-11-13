@@ -105,7 +105,7 @@ def register_in_tracker(tracker_socket: socket.socket, local_ip: str, local_port
     print("Sent message to tracker", message)
 
 def check_if_remote_address_in_tracker(tracker_socket):
-    message = f"1"
+    message = f"1\n"
     tracker_socket.sendall(message.encode("UTF-8"))
     print("Sent tracker message", message)
     message = tracker_socket.recv(1024).decode("UTF-8")
