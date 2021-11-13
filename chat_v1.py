@@ -62,18 +62,13 @@ def make_and_send_local_message(remote_socket: socket.socket) -> str:
         exit_procedure("You exited")
 
 def exit_procedure(optional_message="") -> None:
-    # global my_socket
     print(optional_message)
     print("Exitting...")
     logging.info(optional_message)
-
-    # my_socket.close()
     sys.exit()
 
-def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) -> None:
+def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, my_socket: socket.socket, host_timing: int) -> None:
     """Contacts remote_ip as client"""
-    global my_socket
-    global host_timing
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
     try:
@@ -97,9 +92,7 @@ if __name__ == "__main__":
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
 
     # Initializing
-    global host_timing
     host_timing = math.inf
-    global my_socket
 
     assert len(sys.argv) - 1 == 3, f"""Include local port, remote ip, and remote port when calling this script. 
     You provided {len(sys.argv)-1} arguments."""
@@ -133,7 +126,7 @@ if __name__ == "__main__":
         my_socket.listen(1)
 
         # Initiate connection with args target
-        initate_conversation(remote_ip, remote_port, client_timeout)
+        initate_conversation(remote_ip, remote_port, client_timeout, my_socket, host_timing)
         
     
         try:
