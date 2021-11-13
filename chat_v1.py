@@ -106,14 +106,14 @@ if __name__ == "__main__":
                             datefmt='%D %H:%M:%S',
                             level=logging.INFO)
 
-    # Initiate connection with args target
-    initate_conversation(remote_ip, remote_port, client_timeout)
-
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
         my_socket.settimeout(host_timeout)
         my_socket.bind(("0.0.0.0", local_port))
-        my_socket.listen()
+        my_socket.listen(1)
+
+        # Initiate connection with args target
+        initate_conversation(remote_ip, remote_port, client_timeout)
         
         while True:
             try:
