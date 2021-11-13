@@ -1,5 +1,6 @@
 import os
 import sys
+import math
 import socket
 import logging
 import datetime
@@ -73,7 +74,7 @@ def initate_conversation(remote_ip, remote_port):
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         host_socket.connect((remote_ip, remote_port))
-    except ConnectionRefusedError as e:
+    except (ConnectionRefusedError, TimeoutError) as e:
         logging.error(f"ConnectionRefusedError: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
     threading.Thread(target=message_remote, args=(host_socket, True)).start()
@@ -81,7 +82,7 @@ def initate_conversation(remote_ip, remote_port):
 if __name__ == "__main__":
     global my_socket
     client_timeout = 5
-    host_timeout = client_timeout
+    host_timeout = math.inf
     log = True
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S")
 
@@ -109,8 +110,8 @@ if __name__ == "__main__":
 
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
-        # my_socket.settimeout(10)
-        my_socket.bind(("", local_port))
+        my_socket.settimeout(100)
+        my_socket.bind(("0.0.0.0", local_port))
         my_socket.listen()
         
         while True:
