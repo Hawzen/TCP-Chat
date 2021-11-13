@@ -116,6 +116,14 @@ if __name__ == "__main__":
                             datefmt='%D %H:%M:%S',
                             level=logging.INFO)
 
+    print("""
+  _______ _____ _____     _____ _    _       _______ 
+ |__   __/ ____|  __ \   / ____| |  | |   /\|__   __|
+    | | | |    | |__) | | |    | |__| |  /  \  | |   
+    | | | |    |  ___/  | |    |  __  | / /\ \ | |   
+    | | | |____| |      | |____| |  | |/ ____ \| |   
+    |_|  \_____|_|       \_____|_|  |_/_/    \_\_|   
+    """)
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
         my_socket.settimeout(host_timeout)
