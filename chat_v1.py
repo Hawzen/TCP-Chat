@@ -64,11 +64,12 @@ def exit_procedure(optional_message="") -> None:
     print("Exitting...")
     logging.info(optional_message)
 
-    my_socket.close()
+    # my_socket.close()
     sys.exit()
 
 def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) -> None:
     """Contacts remote_ip as client"""
+    global my_socket
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
     try:
@@ -77,6 +78,7 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) 
         logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
     host_socket.settimeout(None)
+    my_socket.close()
     threading.Thread(target=message_remote, args=(host_socket, True)).start()
 
 if __name__ == "__main__":
