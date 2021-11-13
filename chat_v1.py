@@ -67,8 +67,9 @@ def exit_procedure(optional_message="") -> None:
     logging.info(optional_message)
     sys.exit()
 
-def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, my_socket: socket.socket, host_timing: int) -> None:
+def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, my_socket: socket.socket) -> None:
     """Contacts remote_ip as client"""
+    global host_timing
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
     try:
@@ -92,6 +93,7 @@ if __name__ == "__main__":
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
 
     # Initializing
+    global host_timing
     host_timing = math.inf
 
     assert len(sys.argv) - 1 == 3, f"""Include local port, remote ip, and remote port when calling this script. 
@@ -111,7 +113,7 @@ if __name__ == "__main__":
                             datefmt='%D %H:%M:%S',
                             level=logging.INFO)
     if print_cool_logo:
-        print(r"""
+        print("""
 ████████╗ ██████╗██████╗      ██████╗██╗  ██╗ █████╗ ████████╗   ██╗   ██╗ ██╗
 ╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝   ██║   ██║███║
    ██║   ██║     ██████╔╝    ██║     ███████║███████║   ██║█████╗██║   ██║╚██║
@@ -126,7 +128,7 @@ if __name__ == "__main__":
         my_socket.listen(1)
 
         # Initiate connection with args target
-        initate_conversation(remote_ip, remote_port, client_timeout, my_socket, host_timing)
+        initate_conversation(remote_ip, remote_port, client_timeout, my_socket)
         
     
         try:
