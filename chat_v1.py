@@ -10,12 +10,11 @@ from binascii import hexlify
 def accept_connections(my_socket: socket.socket):
     """This function continuously listens for connections. Run as daemon thread"""
     while True:
-        client_socket, (client_ip, client_port) = my_socket.accept()
+        client_socket, _ = my_socket.accept()
         threading.Thread(target=message_remote, args=(client_socket, False)).start()
 
 def message_remote(remote_socket: socket.socket, message_first: bool) -> None:
     """Given a socket this function initiates a converstation with it"""
-    # remote_socket.settimeout(client_timeout)
     remote_ip, remote_port = remote_socket.getpeername()
     print(f"Connected to {remote_socket.getpeername()}")
     logging.info(f"Connected to {remote_socket.getpeername()}")
@@ -70,29 +69,32 @@ def exit_procedure(optional_message="") -> None:
     my_socket.close()
     sys.exit()
 
-def initate_conversation(remote_ip, remote_port, client_timeout):
+def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) -> None:
+    """Contacts remote_ip as client"""
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
     try:
         host_socket.connect((remote_ip, remote_port))
     except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
-        logging.error(f"ConnectionRefusedError: The host you're connecting to actively refused connection (have you run the second instance?)")
+        logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
     threading.Thread(target=message_remote, args=(host_socket, True)).start()
 
 if __name__ == "__main__":
-    global my_socket
+    # Variables
     client_timeout = 5
-    host_timeout = math.inf
+    host_timeout = 15
     log = True
-    instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S")
+    instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
+
+    # Initializing
+    global my_socket
 
     assert len(sys.argv) - 1 == 3, f"""Include local port, remote ip, and remote port when calling this script. 
     You provided {len(sys.argv)-1} arguments."""
 
     _, local_port, remote_ip, remote_port = sys.argv
     local_port, remote_port = int(local_port), int(remote_port)
-
     
     if log:
         try:
@@ -108,16 +110,15 @@ if __name__ == "__main__":
     # Initiate connection with args target
     initate_conversation(remote_ip, remote_port, client_timeout)
 
-
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
-        my_socket.settimeout(15)
+        my_socket.settimeout(host_timeout)
         my_socket.bind(("0.0.0.0", local_port))
         my_socket.listen()
         
         while True:
             try:
                 client_socket, (client_ip, client_port) = my_socket.accept()
-            except OSError:
+            except OSError: # Happens when closing my_socket elsewhere
                 break
             threading.Thread(target=message_remote, args=(client_socket, False)).start()
