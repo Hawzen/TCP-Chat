@@ -81,7 +81,7 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int) 
     except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
         logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
-        
+
     if host_timing > time.time():
         my_socket.close()
         host_socket.settimeout(None)
@@ -125,10 +125,10 @@ if __name__ == "__main__":
         # Initiate connection with args target
         initate_conversation(remote_ip, remote_port, client_timeout)
         
-        while True:
-            try:
-                client_socket, (client_ip, client_port) = my_socket.accept()
-                host_timing = time.time()
-            except OSError: # Happens when closing my_socket elsewhere
-                break
+    
+        try:
+            client_socket, (client_ip, client_port) = my_socket.accept()
+            host_timing = time.time()
             threading.Thread(target=message_remote, args=(client_socket, False)).start()
+        except OSError: # Happens when closing my_socket elsewhere
+            pass
