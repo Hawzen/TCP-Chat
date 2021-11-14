@@ -24,6 +24,7 @@ def initate_conversation(remote_ip: str, client_timeout: int, my_socket: socket.
             if remote_port == local_port:
                 continue
             host_socket.connect((remote_ip, remote_port))
+            print(remote_ip)
             
             stop_event.set()
             if host_timing > time.time(): # If no one connected yet
@@ -41,8 +42,8 @@ if __name__ == "__main__":
     # Variables
     client_timeout = 5
     host_timeout = 15
-    start_remote_port_range, end_remote_port_range = 23000, 24000
-    num_scans = 10
+    start_remote_port_range, end_remote_port_range = 21000, 22000
+    num_scans = 1
     log = True
     print_cool_logo = True
     logging_folder = "logs/chat_v1"
@@ -59,7 +60,7 @@ if __name__ == "__main__":
     host_timing = math.inf
 
     num_scanners = int((end_remote_port_range - start_remote_port_range) / num_scans)
-    _, remote_ip= sys.argv
+    _, remote_ip = sys.argv
     local_port = random.randint(start_remote_port_range, end_remote_port_range)
     
     if log:
