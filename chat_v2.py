@@ -20,7 +20,6 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
         host_socket.connect((remote_ip, remote_port))
         my_socket.close()
         message_remote(host_socket, True)
-        threading.Thread(target=message_remote, args=(host_socket, True)).start()
     except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
         logging.error(f"Warning: The host you're connecting to actively refused connection")
         return
@@ -43,18 +42,6 @@ def get_client_info_from_tracker(tracker_ip: str, tracker_port: int,
             remote_ip, remote_port = message.split("\n")[1:]
             print("attempting to connect to ", remote_ip, remote_port)
             initate_conversation(remote_ip, int(remote_port), client_timeout, my_socket)
-
-    # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as register_socket:
-    #     register_socket.settimeout(tracker_timeout)
-    #     register_socket.connect((tracker_ip, tracker_port))
-    #     register_in_tracker(register_socket, local_ip, local_port)
-    #     while True:
-    #         other_address = check_if_remote_address_in_tracker(register_socket)
-    #         if other_address is not None:
-    #             return other_address
-    #         time.sleep(1)
-    #         if host_timing != math.inf:
-    #             return
 
 def register_in_tracker(tracker_socket: socket.socket, local_ip: str, local_port: int) -> None:
     message = f"0\n{local_ip}\n{local_port}"
@@ -120,7 +107,7 @@ if __name__ == "__main__":
         my_socket.listen(1)
 
         # Check for other machine address in another thread
-        threading.Thread(target=get_client_info_from_tracker, args=(tracker_ip, tracker_port, tracker_timeout, socket.gethostbyname(socket.gethostname()), local_port)).run()
+        threading.Thread(target=get_client_info_from_tracker, args=(tracker_ip, tracker_port, tracker_timeout, socket.gethostbyname(socket.gethostname()), local_port)).start()
         # other_address = get_client_info_from_tracker(tracker_ip, tracker_port, tracker_timeout, socket.gethostbyname(socket.gethostname()), local_port)
 
         try:

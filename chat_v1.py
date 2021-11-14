@@ -69,7 +69,7 @@ if __name__ == "__main__":
         my_socket.listen(1)
 
         # Initiate connection with args target
-        threading.Thread(target=initate_conversation, args=(remote_ip, remote_port, client_timeout, my_socket)).run()
+        threading.Thread(target=initate_conversation, args=(remote_ip, remote_port, client_timeout, my_socket)).start()
         
     
         try:

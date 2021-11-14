@@ -51,8 +51,10 @@ def make_and_send_local_message(remote_socket: socket.socket) -> str:
         exit_procedure("You exited")
 
 def exit_procedure(optional_message="") -> None:
-    print(optional_message)
-    print("Exitting...")
+    if optional_message:
+        print(optional_message)
+    else:
+        print("Exitting...")
     logging.info(optional_message)
     sys.exit()
 
