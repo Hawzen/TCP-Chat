@@ -78,10 +78,10 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
         logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
         return
 
-    if host_timing > time.time():
+    if host_timing > time.time(): # If no one connected yet
         my_socket.close()
         host_socket.settimeout(None)
-        threading.Thread(target=message_remote, args=(host_socket, True)).start()
+        message_remote(host_socket, True)
 
 if __name__ == "__main__":
     # Variables
@@ -112,6 +112,7 @@ if __name__ == "__main__":
                             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
                             datefmt='%D %H:%M:%S',
                             level=logging.INFO)
+                            
     if print_cool_logo:
         print("""
 ████████╗ ██████╗██████╗      ██████╗██╗  ██╗ █████╗ ████████╗   ██╗   ██╗ ██╗
@@ -128,12 +129,13 @@ if __name__ == "__main__":
         my_socket.listen(1)
 
         # Initiate connection with args target
-        initate_conversation(remote_ip, remote_port, client_timeout, my_socket)
+        threading.Thread(target=initate_conversation, args=(remote_ip, remote_port, client_timeout, my_socket)).run()
         
     
         try:
             client_socket, (client_ip, client_port) = my_socket.accept()
             host_timing = time.time()
-            threading.Thread(target=message_remote, args=(client_socket, False)).start()
+            message_remote(client_socket, False)
+            # We can support multiple users by doing the line above in a thread
         except OSError: # Happens when closing my_socket elsewhere
             pass
