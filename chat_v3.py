@@ -7,14 +7,12 @@ import random
 import logging
 import datetime
 import threading
-from itertools import chain
-from binascii import hexlify
 
 from chat_functions import *
 
-def initate_conversation(remote_ip: str, client_timeout: int, my_socket: socket.socket,
+def scan_and_contact(remote_ip: str, client_timeout: int, my_socket: socket.socket,
                 start_remote_port_range: int, end_remote_port_range: int, stop_event: threading.Event) -> None:
-    """Contacts remote_ip as client"""
+    """Scans port ranges and contact when finding an open port"""
     global host_timing
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
@@ -34,7 +32,6 @@ def initate_conversation(remote_ip: str, client_timeout: int, my_socket: socket.
             else:
                 host_socket.close()
             
-
         except (OSError, ConnectionRefusedError, TimeoutError, socket.timeout) as e:
             pass        
 
@@ -82,6 +79,7 @@ if __name__ == "__main__":
     """)
 
     print(f"My port: {local_port}")
+    
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
         my_socket.settimeout(host_timeout)
@@ -89,19 +87,17 @@ if __name__ == "__main__":
         my_socket.listen(1)
 
         # Initiate connection with args target
-        stop_event = threading.Event()
+        stop_event = threading.Event() # call stop_event.set() to end all threads with this event
         for i in range(num_scanners):
-            threading.Thread(target=initate_conversation, args=(remote_ip, client_timeout, my_socket, 
+            threading.Thread(target=scan_and_contact, args=(remote_ip, client_timeout, my_socket, 
                     int(start_remote_port_range + (end_remote_port_range - start_remote_port_range) / num_scanners * i),
                     int(start_remote_port_range + (end_remote_port_range - start_remote_port_range) / num_scanners * (i+1)),
                     stop_event
                 )).start()
-        
     
         try:
             client_socket, (client_ip, client_port) = my_socket.accept()
             host_timing = time.time()
             message_remote(client_socket, False)
-            # We can support multiple users by doing the line above in a thread
         except OSError: # Happens when closing my_socket elsewhere
             pass

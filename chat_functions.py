@@ -8,20 +8,14 @@ def message_remote(remote_socket: socket.socket, message_first: bool) -> None:
     remote_ip, remote_port = remote_socket.getpeername()
     print(f"Connected to {remote_socket.getpeername()}")
     logging.info(f"Connected to {remote_socket.getpeername()}")
-    message_count = 0
     
-    if message_first: 
-        while True:
-            print(f"\nMessage number {message_count}")
+    while True:
+        if message_first:
             make_and_send_local_message(remote_socket)
             process_remote_message(remote_socket, ip=remote_ip, port=remote_port)
-            message_count += 1
-    else:
-        while True:
-            print(f"\nMessage number {message_count}")
+        else:
             process_remote_message(remote_socket, ip=remote_ip, port=remote_port)
             make_and_send_local_message(remote_socket)
-            message_count += 1
 
 def process_remote_message(remote_socket: socket.socket, ip: str, port: int) -> None:
     """Checks incoming message and logs it"""
@@ -38,7 +32,6 @@ def process_remote_message(remote_socket: socket.socket, ip: str, port: int) -> 
         exit_procedure(f"Remote {name} exited")
 
 def make_and_send_local_message(remote_socket: socket.socket) -> str:
-    """Make local message"""  
     message_log = f"You ({socket.gethostname()}): "
     message = input(message_log).strip()
     if not message:
@@ -53,8 +46,9 @@ def make_and_send_local_message(remote_socket: socket.socket) -> str:
 def exit_procedure(optional_message="") -> None:
     if optional_message:
         print(optional_message)
+        logging.info(optional_message)
     else:
         print("Exitting...")
-    logging.info(optional_message)
+        logging.info("Exitting...")
     sys.exit()
 

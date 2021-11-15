@@ -6,7 +6,6 @@ import socket
 import logging
 import datetime
 import threading
-from binascii import hexlify
 
 from chat_functions import *
 
@@ -16,9 +15,12 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
     try:
+        print("Trying to connect")
         host_socket.connect((remote_ip, remote_port))
+        print("Connected")
     except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
         logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
+        print("Connection failed")
         return
 
     if host_timing > time.time(): # If no one connected yet
@@ -69,10 +71,9 @@ if __name__ == "__main__":
         my_socket.listen(1)
 
         # Initiate connection with args target
-        threading.Thread(target=initate_conversation, args=(remote_ip, remote_port, client_timeout, my_socket)).start()
-        
     
         try:
+            threading.Thread(target=initate_conversation, args=(remote_ip, remote_port, client_timeout, my_socket)).start()
             client_socket, (client_ip, client_port) = my_socket.accept()
             host_timing = time.time()
             message_remote(client_socket, False)

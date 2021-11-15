@@ -7,7 +7,6 @@ import random
 import logging
 import datetime
 import threading
-from binascii import hexlify
 
 from chat_functions import *
 
@@ -20,12 +19,13 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
         host_socket.connect((remote_ip, remote_port))
         my_socket.close()
         message_remote(host_socket, True)
-    except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
+    except (ConnectionRefusedError, TimeoutError, socket.timeout):
         logging.error(f"Warning: The host you're connecting to actively refused connection")
-        return
 
-def get_client_info_from_tracker(tracker_ip: str, tracker_port: int, 
-                                tracker_timeout: int, local_ip: str, local_port: int) -> tuple:
+def register_or_contact(tracker_ip: str, tracker_port: int, 
+                                tracker_timeout: int, local_ip: str, local_port: int) -> None:
+    """If this function is called before remote calls it then local will register their ip and port in tracker
+    If this function is called after remote calls it then local will contact remote via tracker"""
     global host_timing
     global other_address
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as register_socket:
@@ -43,26 +43,12 @@ def get_client_info_from_tracker(tracker_ip: str, tracker_port: int,
             print("attempting to connect to ", remote_ip, remote_port)
             initate_conversation(remote_ip, int(remote_port), client_timeout, my_socket)
 
-def register_in_tracker(tracker_socket: socket.socket, local_ip: str, local_port: int) -> None:
-    message = f"0\n{local_ip}\n{local_port}"
-    tracker_socket.sendall(message.encode("UTF-8"))
-    print("Sent message to tracker: ", message)
-
-def check_if_remote_address_in_tracker(tracker_socket):
-    message = f"1"
-    tracker_socket.send(message.encode("UTF-8"))
-    print("Sent tracker message: ", message)
-    message = tracker_socket.recv(1024).decode("UTF-8")
-    print("Got message from tracker: ", message.replace("\n", " "))
-    if message[0] == "1":
-        remote_ip, remote_port = message.split("\n")[1:]
-        return remote_ip, int(remote_port)
-
 if __name__ == "__main__":
     # Variables
     client_timeout = 5
     host_timeout = 15
     tracker_timeout = 30
+    start_local_port_range, end_local_port_range = 21000, 22000
     log = True
     logging_folder = "logs/chat_v2"
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
@@ -80,7 +66,7 @@ if __name__ == "__main__":
     _, tracker_ip, tracker_port = sys.argv
     tracker_port = int(tracker_port)
     
-    local_port = random.randint(21000, 22000)
+    local_port = random.randint(start_local_port_range, end_local_port_range)
 
     if log:
         os.makedirs(logging_folder, exist_ok=True)
@@ -106,9 +92,8 @@ if __name__ == "__main__":
         my_socket.bind(("0.0.0.0", local_port))
         my_socket.listen(1)
 
-        # Check for other machine address in another thread
-        threading.Thread(target=get_client_info_from_tracker, args=(tracker_ip, tracker_port, tracker_timeout, socket.gethostbyname(socket.gethostname()), local_port)).start()
-        # other_address = get_client_info_from_tracker(tracker_ip, tracker_port, tracker_timeout, socket.gethostbyname(socket.gethostname()), local_port)
+        # Register or contact via the tracker
+        threading.Thread(target=register_or_contact, args=(tracker_ip, tracker_port, tracker_timeout, socket.gethostbyname(socket.gethostname()), local_port)).start()
 
         try:
             client_socket, (client_ip, client_port) = my_socket.accept()
