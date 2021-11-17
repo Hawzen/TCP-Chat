@@ -20,7 +20,7 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
         my_socket.close()
         message_remote(host_socket, True)
     except (ConnectionRefusedError, TimeoutError, socket.timeout):
-        logging.error(f"Warning: The host you're connecting to actively refused connection")
+        pass
 
 def register_or_contact(tracker_ip: str, tracker_port: int, 
                                 tracker_timeout: int, local_ip: str, local_port: int) -> None:
@@ -34,13 +34,12 @@ def register_or_contact(tracker_ip: str, tracker_port: int,
         message = f"\n{local_ip}\n{local_port}"
         register_socket.sendall(message.encode("UTF-8"))
         message = register_socket.recv(1024).decode("UTF-8")
-        print("Got message", message)
+        print("Got message", message.replace("\n", " ").strip())
         if message == "OK":
             other_address = None
             return
         else:
             remote_ip, remote_port = message.split("\n")[1:]
-            print("attempting to connect to ", remote_ip, remote_port)
             initate_conversation(remote_ip, int(remote_port), client_timeout, my_socket)
 
 if __name__ == "__main__":
