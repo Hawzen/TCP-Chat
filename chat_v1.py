@@ -15,12 +15,8 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.settimeout(client_timeout)
     try:
-        print("Trying to connect")
         host_socket.connect((remote_ip, remote_port))
-        print("Connected")
-    except (ConnectionRefusedError, TimeoutError, socket.timeout) as e:
-        logging.error(f"Warning: The host you're connecting to actively refused connection (have you run the second instance?)")
-        print("Connection failed")
+    except (ConnectionRefusedError, TimeoutError, socket.timeout):
         return
 
     if host_timing > time.time(): # If no one connected yet
@@ -51,19 +47,20 @@ if __name__ == "__main__":
         os.makedirs(logging_folder, exist_ok=True)
         logging.basicConfig(filename=f"{logging_folder}/{instance_name}.log",
                             filemode="w",
-                            format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
-                            datefmt='%D %H:%M:%S',
+                            format="%(asctime)s %(name)s %(levelname)s %(message)s",
+                            datefmt= "%Y-%m-%d %H:%M:%S",
                             level=logging.INFO)
                             
     if print_cool_logo:
-        print("""
+        print('''
 ████████╗ ██████╗██████╗      ██████╗██╗  ██╗ █████╗ ████████╗   ██╗   ██╗ ██╗
 ╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝   ██║   ██║███║
    ██║   ██║     ██████╔╝    ██║     ███████║███████║   ██║█████╗██║   ██║╚██║
    ██║   ██║     ██╔═══╝     ██║     ██╔══██║██╔══██║   ██║╚════╝╚██╗ ██╔╝ ██║
    ██║   ╚██████╗██║         ╚██████╗██║  ██║██║  ██║   ██║       ╚████╔╝  ██║
    ╚═╝    ╚═════╝╚═╝          ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝        ╚═══╝   ╚═╝
-    """)
+
+    ''')
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
         my_socket.settimeout(host_timeout)
