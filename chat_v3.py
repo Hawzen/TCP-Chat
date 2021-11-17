@@ -22,7 +22,6 @@ def scan_and_contact(remote_ip: str, client_timeout: int, my_socket: socket.sock
             if remote_port == local_port:
                 continue
             host_socket.connect((remote_ip, remote_port))
-            print(remote_ip)
             
             stop_event.set()
             if host_timing > time.time(): # If no one connected yet
