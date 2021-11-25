@@ -26,7 +26,7 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
 
 if __name__ == "__main__":
     # Variables
-    client_timeout = 5
+    client_timeout = 15
     host_timeout = 15
     log = True
     print_cool_logo = True

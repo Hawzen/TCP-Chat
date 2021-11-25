@@ -44,7 +44,7 @@ def register_or_contact(tracker_ip: str, tracker_port: int,
 
 if __name__ == "__main__":
     # Variables
-    client_timeout = 5
+    client_timeout = 15
     host_timeout = 15
     tracker_timeout = 30
     start_local_port_range, end_local_port_range = 21000, 22000

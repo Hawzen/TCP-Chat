@@ -36,7 +36,7 @@ def scan_and_contact(remote_ip: str, client_timeout: int, my_socket: socket.sock
 
 if __name__ == "__main__":
     # Variables
-    client_timeout = 5
+    client_timeout = 15
     host_timeout = 15
     start_remote_port_range, end_remote_port_range = 21000, 22000
     num_scans = 1
