@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # Variables
     client_timeout = 30
     host_timeout = 30
-    log = True
+    log = False
     print_cool_logo = True
     logging_folder = "logs/chat_v1"
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging

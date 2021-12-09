@@ -40,7 +40,7 @@ if __name__ == "__main__":
     host_timeout = 30
     start_remote_port_range, end_remote_port_range = 21000, 22000
     num_scans = 1
-    log = True
+    log = False
     print_cool_logo = True
     logging_folder = "logs/chat_v1"
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging

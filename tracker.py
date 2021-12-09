@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # Variables
     tracker_timeout = 30
     client_timeout = 30
-    log = True
+    log = False
     logging_folder = "logs/chat_v2_tracker"
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
     print_cool_logo = True

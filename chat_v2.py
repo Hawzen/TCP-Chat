@@ -52,7 +52,7 @@ if __name__ == "__main__":
     host_timeout = 30
     tracker_timeout = 45
     start_local_port_range, end_local_port_range = 21000, 22000
-    log = True
+    log = False
     logging_folder = "logs/chat_v2"
     instance_name =  datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S") # Used for logging
     print_cool_logo = True
