@@ -36,8 +36,8 @@ def scan_and_contact(remote_ip: str, client_timeout: int, my_socket: socket.sock
 
 if __name__ == "__main__":
     # Variables
-    client_timeout = 15
-    host_timeout = 15
+    client_timeout = 30
+    host_timeout = 30
     start_remote_port_range, end_remote_port_range = 21000, 22000
     num_scans = 1
     log = True
@@ -77,7 +77,7 @@ if __name__ == "__main__":
    ╚═╝    ╚═════╝╚═╝          ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝        ╚═══╝  ╚═════╝ 
     """)
 
-    print(f"My port: {local_port}")
+    print(f"My randomly generated port: {local_port}")
     
     # Accept any new connections
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as my_socket:
@@ -87,6 +87,7 @@ if __name__ == "__main__":
 
         # Initiate connection with args target
         stop_event = threading.Event() # call stop_event.set() to end all threads with this event
+        print(f"Creating {num_scanners} threads to scan [{start_remote_port_range}, {end_remote_port_range}] ports\n")
         for i in range(num_scanners):
             threading.Thread(target=scan_and_contact, args=(remote_ip, client_timeout, my_socket, 
                     int(start_remote_port_range + (end_remote_port_range - start_remote_port_range) / num_scanners * i),

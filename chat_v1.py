@@ -26,8 +26,8 @@ def initate_conversation(remote_ip: str, remote_port: int, client_timeout: int, 
 
 if __name__ == "__main__":
     # Variables
-    client_timeout = 15
-    host_timeout = 15
+    client_timeout = 30
+    host_timeout = 30
     log = True
     print_cool_logo = True
     logging_folder = "logs/chat_v1"

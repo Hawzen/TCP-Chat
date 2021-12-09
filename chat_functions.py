@@ -1,3 +1,4 @@
+import os
 import sys
 import socket
 import logging
@@ -28,7 +29,7 @@ def process_remote_message(remote_socket: socket.socket, ip: str, port: int) -> 
     print(message_log + message + "            ")
     logging.info(message_log + message)
 
-    if message == "exit":
+    if message.lower() == "exit":
         exit_procedure(f"Remote {name} exited")
 
 def make_and_send_local_message(remote_socket: socket.socket) -> str:
@@ -50,5 +51,8 @@ def exit_procedure(optional_message="") -> None:
     else:
         print("Exitting...")
         logging.info("Exitting...")
-    sys.exit()
+    try:
+        sys.exit(0)
+    except SystemExit:
+        os._exit(0)
 

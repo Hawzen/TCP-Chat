@@ -28,25 +28,29 @@ def register_or_contact(tracker_ip: str, tracker_port: int,
     If this function is called after remote calls it then local will contact remote via tracker"""
     global host_timing
     global other_address
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as register_socket:
-        register_socket.settimeout(tracker_timeout)
-        register_socket.connect((tracker_ip, tracker_port))
-        message = f"\n{local_ip}\n{local_port}"
-        register_socket.sendall(message.encode("UTF-8"))
-        message = register_socket.recv(1024).decode("UTF-8")
-        print("Got message", message.replace("\n", " ").strip())
-        if message == "OK":
-            other_address = None
-            return
-        else:
-            remote_ip, remote_port = message.split("\n")[1:]
-            initate_conversation(remote_ip, int(remote_port), client_timeout, my_socket)
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as register_socket:
+            register_socket.settimeout(tracker_timeout)
+            register_socket.connect((tracker_ip, tracker_port))
+            message = f"\n{local_ip}\n{local_port}"
+            register_socket.sendall(message.encode("UTF-8"))
+            message = register_socket.recv(1024).decode("UTF-8")
+            print("Got message", message.replace("\n", " ").strip())
+            if message == "OK":
+                other_address = None
+                return
+            else:
+                remote_ip, remote_port = message.split("\n")[1:]
+                initate_conversation(remote_ip, int(remote_port), client_timeout, my_socket)
+    except (ConnectionRefusedError):
+        time.sleep(2)
+        register_or_contact(tracker_ip, tracker_port, tracker_timeout, local_ip, local_port)
 
 if __name__ == "__main__":
     # Variables
-    client_timeout = 15
-    host_timeout = 15
-    tracker_timeout = 30
+    client_timeout = 30
+    host_timeout = 30
+    tracker_timeout = 45
     start_local_port_range, end_local_port_range = 21000, 22000
     log = True
     logging_folder = "logs/chat_v2"

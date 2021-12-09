@@ -41,11 +41,13 @@ def handle_request(client_socket: socket.socket):
 def exit_procedure(optional_message="") -> None:
     global my_socket
     print(optional_message)
-    print("Press Ctrl+C")
     my_socket.close()
     logging.info(optional_message)
     logging.info("Exitting...")
-    sys.exit()
+    try:
+        sys.exit(0)
+    except SystemExit:
+        os._exit(0)
 
 if __name__ == "__main__":
     # Variables
