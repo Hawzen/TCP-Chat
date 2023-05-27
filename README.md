@@ -9,6 +9,6 @@ This program lets you chat to another machine in your LAN.
 
 ![clients](https://i.imgur.com/ndUDuQg.png)
 
-TCP chat > WhtasApp
+TCP chat > WhatsApp
 
 ##### Note: This program is homework for course CSC329
